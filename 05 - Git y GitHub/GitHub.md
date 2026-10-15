@@ -140,11 +140,117 @@ Los **issues** permiten registrar errores, ideas y tareas. Pueden asignarse a pe
 
 `.gitignore` indica qué archivos o carpetas no debe registrar Git. Suele excluir dependencias instaladas, archivos temporales, configuraciones personales y secretos.
 
+### Dónde se crea
+
+Normalmente se crea en la **carpeta raíz del repositorio**, al mismo nivel que la carpeta oculta `.git`. El nombre debe ser exactamente `.gitignore`, sin otro nombre delante ni extensiones como `.txt`.
+
+```text
+mi-proyecto/
+├── .git/
+├── .gitignore
+├── README.md
+└── src/
+```
+
+Un repositorio también puede tener archivos `.gitignore` dentro de subcarpetas. En ese caso, sus reglas se aplican a esa carpeta y a las que contiene.
+
+### Cómo crearlo
+
+**Desde Visual Studio Code:**
+
+1. Abrir la carpeta principal del proyecto.
+2. Seleccionar **Nuevo archivo** en el explorador.
+3. Escribir `.gitignore` como nombre y pulsar `Enter`.
+4. Añadir las reglas necesarias y guardar el archivo.
+
+**Desde PowerShell:**
+
+```powershell
+New-Item -Name ".gitignore" -ItemType File
+```
+
+**Desde una terminal compatible con Bash:**
+
+```bash
+touch .gitignore
+```
+
+Si se crea con el Bloc de notas de Windows, hay que evitar que el archivo termine llamándose `.gitignore.txt`. Una opción es seleccionar **Todos los archivos** al guardarlo y usar `.gitignore` como nombre.
+
+### Cómo escribir las reglas
+
+Cada línea contiene un patrón. Las líneas vacías se ignoran y las que empiezan por `#` sirven como comentarios.
+
 ```gitignore
+# Ignorar una carpeta y todo su contenido
 node_modules/
+vendor/
+
+# Ignorar un archivo concreto
 .env
+.env.local
+
+# Ignorar todos los archivos con una extensión
 *.log
+*.tmp
+
+# Ignorar una carpeta generada
 dist/
+build/
+
+# No ignorar un archivo que coincide con una regla anterior
+!.env.example
+
+# Configuración del editor
+.vscode/
+.idea/
+
+```
+
+Patrones habituales:
+
+| Patrón | Resultado |
+|---|---|
+| `archivo.txt` | Ignora archivos con ese nombre. |
+| `carpeta/` | Ignora la carpeta y todo su contenido. |
+| `*.log` | Ignora todos los archivos terminados en `.log`. |
+| `/config.local` | Ignora ese archivo solo en la raíz del repositorio. |
+| `temp/**/*.txt` | Ignora archivos `.txt` dentro de `temp` y sus subcarpetas. |
+| `!archivo.txt` | Vuelve a incluir un archivo excluido por otra regla. |
+
+### Comprobar que funciona
+
+Después de guardar `.gitignore`, se puede revisar el estado del repositorio:
+
+```bash
+git status
+```
+
+Los archivos ignorados no deberían aparecer como archivos nuevos. Para comprobar qué regla está ignorando un archivo concreto:
+
+```bash
+git check-ignore -v ruta/del/archivo
+```
+
+Por último, conviene guardar el propio `.gitignore` en el repositorio:
+
+```bash
+git add .gitignore
+git commit -m "Añade reglas de gitignore"
+```
+
+### Si el archivo ya estaba registrado por Git
+
+`.gitignore` solo afecta a archivos que Git todavía no está siguiendo. Si un archivo ya forma parte de un commit, primero hay que retirarlo del seguimiento sin borrarlo del equipo:
+
+```bash
+# Retirar un archivo del seguimiento
+git rm --cached nombre-del-archivo
+
+# Retirar una carpeta del seguimiento
+git rm -r --cached nombre-de-la-carpeta
+
+git commit -m "Deja de registrar archivos ignorados"
 ```
 
 ⚠️ No deben publicarse contraseñas, claves privadas ni tokens. Añadir un secreto a `.gitignore` después de haberlo confirmado no lo elimina del historial anterior.
